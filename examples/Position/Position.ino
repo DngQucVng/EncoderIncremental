@@ -7,7 +7,6 @@
 EncoderIncremental myEncoder(PIN_A, PIN_B, PULSE_PER_REVOLUTION);
 
 unsigned long now, prePrint;
-float printRate = 5;
 
 void setup() {
   Serial.begin(115200);
@@ -16,14 +15,17 @@ void setup() {
   myEncoder.begin();
 
   // Add this when you have linear translation
-  myEncoder.set_meters_per_revolution(0.005);
+  myEncoder.set_meters_per_revolution(0.2); // 0.2m = 200mm
+
+  // Add this to invert positive and negative direction
+  myEncoder.invert_direction();
 }
 
 void loop() {
-  now = micros();
+  now = millis();
 
   // Print position 5 times per second
-  if (now - prePrint >= 1e6 / printRate) {
+  if (now - prePrint >= 200) {
     prePrint = now;
 
     Serial.print("Number of pulses: ");            Serial.println(myEncoder.get_position_pulse());

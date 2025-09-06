@@ -43,6 +43,9 @@ class EncoderIncremental {
 		// Return the speed of encoder in meters per second (m/s), could be positive or negative for clockwise and anti-clockwise
 		float get_speed_mps() const { return (speedRPM * linearTranslationPerRevolution) / (60.0); }
 
+		// Invert the positive and negative direction (clockwise and anti-clockwise)
+		void invert_direction() { direction = !direction; }
+
 		// Set the pulse counter to zero
 		void reset_position() { countEdge = preCountEdge = 0; }
 
@@ -50,7 +53,7 @@ class EncoderIncremental {
 		void set_meters_per_revolution(float Meters) { linearTranslationPerRevolution = Meters; }
 
 		// Set how many times speed is calculated in one second, default is 10
-		void set_check_speed_frequency(float Frequency) { checkSpeedFreq = Frequency; }
+		void set_speed_sample_rate(float Frequency) { speedSampleRate = Frequency; }
 
 	private:
 		const uint8_t PIN_A, PIN_B;
@@ -58,7 +61,8 @@ class EncoderIncremental {
 
 		volatile int32_t countEdge, preCountEdge = 0;
 
-		float speedRPM = 0.0, checkSpeedFreq = 10.0, linearTranslationPerRevolution = 0.0;
+		float speedRPM = 0.0, speedSampleRate = 10.0, linearTranslationPerRevolution = 0.0;
+		bool direction = false;
 
 		void ARDUINO_ISR_ATTR isr_a();
 		void ARDUINO_ISR_ATTR isr_b();

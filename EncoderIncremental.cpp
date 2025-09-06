@@ -9,17 +9,17 @@ void EncoderIncremental::begin() {
 // Interrupt Service Routine for when the Pin A change state
 void ARDUINO_ISR_ATTR EncoderIncremental::isr_a() {
 	if (digitalRead(PIN_A) == digitalRead(PIN_B))
-		countEdge++;
+		if (direction) countEdge++; else countEdge--;
 	else
-		countEdge--;
+		if (direction) countEdge--; else countEdge++;
 }
 
 // Interrupt Service Routine for when the Pin B change state
 void ARDUINO_ISR_ATTR EncoderIncremental::isr_b() {
 	if (digitalRead(PIN_A) != digitalRead(PIN_B))
-		countEdge++;
+		if (direction) countEdge++; else countEdge--;
 	else
-		countEdge--;
+		if (direction) countEdge--; else countEdge++;
 }
 
 void EncoderIncremental::check() {
@@ -27,11 +27,10 @@ void EncoderIncremental::check() {
 
 	now = millis();
 
-	// Calculate speed (default 10 times per second)
-	if (now - preCheck >= 1000 / checkSpeedFreq) {
+	if (now - preCheck >= 1000 / speedSampleRate) {
 		preCheck = now;
 
-		speedRPM = (((float)countEdge - (float)preCountEdge) * checkSpeedFreq * 60.0) / ((float)PPR * 4.0);
+		speedRPM = (((float)countEdge - (float)preCountEdge) * speedSampleRate * 60.0) / ((float)PPR * 4.0);
 
 		preCountEdge = countEdge;
 	}
