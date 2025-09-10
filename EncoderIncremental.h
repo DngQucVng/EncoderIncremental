@@ -1,14 +1,16 @@
 #include <Arduino.h>
-#include <FunctionalInterrupt.h>
 #include <stdint.h>
+
+#ifdef ARDUINO_ARCH_STM32
+	#include <WInterrupts.h>
+#elifdef ESP32 || ESP8266 || ARDUINO_ARCH_ESP32 || ARDUINO_ARCH_ESP8266
+	#include <FunctionalInterrupt.h>
+#endif
 
 class EncoderIncremental {
 	public:
 		// Constructor
-		EncoderIncremental(uint8_t PinA, uint8_t PinB, uint32_t PulsePerRevolution) : PIN_A(PinA), PIN_B(PinB), PPR(PulsePerRevolution) {
-			pinMode(PIN_A, INPUT);
-			pinMode(PIN_B, INPUT);
-		}
+		EncoderIncremental(uint8_t PinA, uint8_t PinB, uint32_t PulsePerRevolution);
 
 		// Destructor
 		~EncoderIncremental() {
@@ -64,6 +66,11 @@ class EncoderIncremental {
 		float speedRPM = 0.0, speedSampleRate = 10.0, linearTranslationPerRevolution = 0.0;
 		bool direction = false;
 
-		void ARDUINO_ISR_ATTR isr_a();
-		void ARDUINO_ISR_ATTR isr_b();
+		#ifdef ESP32 || ESP8266 || ARDUINO_ARCH_ESP32 || ARDUINO_ARCH_ESP8266
+			void ARDUINO_ISR_ATTR isr_a();
+			void ARDUINO_ISR_ATTR isr_b();
+		#else
+			void isr_a();
+			void isr_b();
+		#endif
 };
